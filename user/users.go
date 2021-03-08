@@ -11,11 +11,6 @@ type User struct {
 	Password string
 }
 
-// var users = []map[string]string{
-// 	map[string]string{"email": "test1@email.com", "password": encryptPassword("12345678")},
-// 	map[string]string{"email": "test2@email.com", "password": encryptPassword("12345679")},
-// }
-
 var users = []User{
 	{Email: "test1@email.com", Password: encryptPassword("12345678")},
 	{Email: "test2@email.com", Password: encryptPassword("12345679")},
