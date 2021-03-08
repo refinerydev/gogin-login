@@ -10,8 +10,12 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/refinerydev/gogin-login/auth"
+	"github.com/refinerydev/gogin-login/helper"
 	"github.com/refinerydev/gogin-login/user"
 )
 
@@ -19,11 +23,25 @@ func main() {
 	fmt.Println("running")
 	r := gin.Default()
 
-	userService := user.UserService(user.User{})
-	user1 := userService.GetUser("test1@email.com")
+	// user1 := userService.GetUser("test1@email.com")
 
-	r.GET("/login", func(c *gin.Context) {
-		c.JSON(200, gin.H{"data": user1})
+	r.POST("/login", func(c *gin.Context) {
+		var req helper.LoginRequest
+		if err := c.Bind(&req); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		}
+		userService := user.UserService(user.User{})
+		authService := auth.AuthService(userService)
+
+		authenticatedUser, err := authService.UserAuth(req)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"message": err.Error()})
+		} else {
+			c.JSON(http.StatusOK, gin.H{"data": authenticatedUser})
+		}
 	})
-	r.Run()
+
+	if err := r.Run(); err != nil {
+		log.Fatal(err.Error())
+	}
 }
