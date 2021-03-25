@@ -34,10 +34,21 @@ func main() {
 		authService := auth.AuthService(userService)
 
 		authenticatedUser, err := authService.UserAuth(req)
+		authToken, _ := authService.GenerateToken(req.Email)
+
+		userData := helper.UserResponseFormatter(authenticatedUser, authToken)
+
+		responseFormatter := helper.ResponseFormatter(
+			http.StatusOK,
+			"success",
+			"authenticated",
+			userData,
+		)
+
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"message": err.Error()})
 		} else {
-			c.JSON(http.StatusOK, gin.H{"data": authenticatedUser})
+			c.JSON(http.StatusOK, responseFormatter)
 		}
 	})
 
